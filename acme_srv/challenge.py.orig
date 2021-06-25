@@ -140,11 +140,6 @@ class Challenge(object):
 
         if 'Order' in config_dic:
             self.tnauthlist_support = config_dic.getboolean('Order', 'tnauthlist_support', fallback=False)
-
-        if 'Directory' in config_dic:            
-            if 'url_prefix' in config_dic['Directory']:
-                self.path_dic = {k: config_dic['Directory']['url_prefix'] + v for k, v in self.path_dic.items()}
-
         self.logger.debug('Challenge._config_load() ended.')
 
     def _name_get(self, url):
@@ -316,7 +311,7 @@ class Challenge(object):
         (response, invalid) = fqdn_resolve(fqdn, self.dns_server_list)
         self.logger.debug('fqdn_resolve() ended with: {0}/{1}'.format(response, invalid))
         if not invalid:
-            req = url_get(self.logger, 'http://{0}/.well-known/acme-challenge/{1}'.format(fqdn, token), self.dns_server_list, verify=False)
+            req = url_get(self.logger, 'http://{0}/.well-known/acme-challenge/{1}'.format(fqdn, token), self.dns_server_list)
             # make challenge validation unsuccessful
             # req = url_get(self.logger, 'http://{0}/.well-known/acme-challenge/{1}'.format('test.test', 'foo.bar.some.not.existing.ressource'))
             if req:
