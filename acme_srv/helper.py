@@ -587,7 +587,7 @@ def patched_create_connection(address, *args, **kwargs):
     # pylint: disable=W0212
     return connection._orig_create_connection((hostname, port), *args, **kwargs)
 
-def url_get_with_own_dns(logger, url):
+def url_get_with_own_dns(logger, url, verify=True):
     """ request by using an own dns resolver """
     logger.debug('url_get_with_own_dns({0})'.format(url))
     # patch an own connection handler into URL lib
@@ -595,7 +595,7 @@ def url_get_with_own_dns(logger, url):
     connection._orig_create_connection = connection.create_connection
     connection.create_connection = patched_create_connection
     try:
-        req = requests.get(url, headers={'Connection':'close', 'Accept-Encoding': 'gzip', 'User-Agent': 'acme2certifier/{0}'.format(__version__)})
+        req = requests.get(url, verify=verify, headers={'Connection':'close', 'Accept-Encoding': 'gzip', 'User-Agent': 'acme2certifier/{0}'.format(__version__)})
         result = req.text
     except BaseException as err_:
         result = None
@@ -613,10 +613,10 @@ def url_get(logger, url, dns_server_list=None, verify=True):
     """ http get """
     logger.debug('url_get({0})'.format(url))
     if dns_server_list:
-        result = url_get_with_own_dns(logger, url)
+        result = url_get_with_own_dns(logger, url, verify)
     else:
         try:
-            req = requests.get(url, headers={'Connection':'close', 'Accept-Encoding': 'gzip', 'User-Agent': 'acme2certifier/{0}'.format(__version__)})
+            req = requests.get(url, verify=verify, headers={'Connection':'close', 'Accept-Encoding': 'gzip', 'User-Agent': 'acme2certifier/{0}'.format(__version__)})
             result = req.text
         except BaseException as err_:
             # force fallback to ipv4
